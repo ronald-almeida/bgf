@@ -1,138 +1,117 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#3d0045">
-  <meta name="description" content="Checkout SKN Science Academy">
-  <title>SKN Science Academy | Peelings e Cosmecêuticos</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<meta content="#3d0045" name="theme-color"/>
+<meta content="Checkout SKN Science Academy" name="description"/>
+<title>SKN Science Academy | Peelings e Cosmecêuticos</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="/style.css" rel="stylesheet"/>
 </head>
 <body>
-  <main class="page-shell">
-    <header class="brand-header" aria-label="SKN Science Academy">
-      <img class="brand-logo" src="https://pay.hub.la/app/api/bff-asset-cache?processParameter_outputType=webp&processParameter_type=resize&processParameter_quality=85&processParameter_width=160&source_type=url&source_ownerId=uHoiisEUIfT5kLr0iuriAatR1wf2&source_name=logo&source_url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fchatpay-cd120.appspot.com%2Fo%2Fprivate%252Fcheckout%252FqL8SCo5KiWT0UM45g5fa%252FeqWrNb7Y.png%3Falt%3Dmedia%26token%3Dfc5cf2ce-4090-426b-a0f8-d084dbb8a655" alt="SKN Science Academy">
-    </header>
-
-    <section class="checkout-card" id="checkoutCard">
-      <div id="checkoutStep">
-        <div class="product-summary">
-          <img class="product-image" src="https://pay.hub.la/app/api/bff-asset-cache?processParameter_outputType=webp&processParameter_type=resize&processParameter_quality=85&processParameter_width=140&source_type=url&source_ownerId=uHoiisEUIfT5kLr0iuriAatR1wf2&source_name=productImage&source_url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fchatpay-cd120.appspot.com%2Fo%2Fprivate%252FqL8SCo5KiWT0UM45g5fa%252F7MuVKqBZ.png%3Falt%3Dmedia%26token%3Df47e2233-e361-4c5f-861d-fca4fe2a4810" alt="Curso Peelings e Cosmecêuticos">
-          <div class="product-copy">
-            <h1>SKN Science Academy | Peelings e Cosmecêuticos</h1>
-            <p class="old-price">De: R$ 7.200,00</p>
-            <p class="current-price">Por: <strong>R$ 4.200,00</strong></p>
-          </div>
-          <button class="details-button" type="button" aria-label="Detalhes do produto">Detalhes <span>⌄</span></button>
-        </div>
-
-        <button class="coupon-button" type="button" disabled>Adicionar cupom <span>＋</span></button>
-
-        <form id="checkoutForm" novalidate>
-          <fieldset>
-            <legend>Informações pessoais</legend>
-            <div class="input-stack">
-              <label class="sr-only" for="email">E-mail</label>
-              <input id="email" name="email" type="email" autocomplete="email" placeholder="Email" required>
-
-              <label class="sr-only" for="phone">Telefone</label>
-              <div class="phone-wrap">
-                <span class="flag" aria-hidden="true">🇧🇷</span>
-                <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="Telefone" maxlength="16" required>
-              </div>
-
-              <label class="sr-only" for="name">Nome completo</label>
-              <input id="name" name="name" type="text" autocomplete="name" placeholder="Nome completo" maxlength="100" required>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Plano de assinatura</legend>
-            <div class="select-like" aria-label="Plano anual">
-              <span>Anual</span><span>⌄</span>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Método de pagamento</legend>
-            <div class="payment-method active" aria-label="Pix selecionado">
-              <div class="pix-symbol" aria-hidden="true">
-                <span></span><span></span><span></span><span></span>
-              </div>
-              <div>
-                <strong>Pix</strong>
-                <small>Pagamento à vista</small>
-              </div>
-              <span class="selected-check">✓</span>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Documento</legend>
-            <label class="sr-only" for="document">CPF ou CNPJ</label>
-            <input class="single-input" id="document" name="document" type="text" inputmode="numeric" autocomplete="off" placeholder="CPF/CNPJ" maxlength="18" required>
-          </fieldset>
-
-          <p class="form-error" id="formError" role="alert" aria-live="polite"></p>
-
-          <button class="submit-button" id="submitButton" type="submit">
-            <span class="button-label">Gerar Pix</span>
-            <span class="spinner" aria-hidden="true"></span>
-          </button>
-
-          <div class="secure-note">
-            <span class="lock-icon" aria-hidden="true">▣</span>
+<main class="page-shell">
+<header aria-label="SKN Science Academy" class="brand-header">
+<img alt="SKN Science Academy" class="brand-logo" src="https://pay.hub.la/app/api/bff-asset-cache?processParameter_outputType=webp&amp;processParameter_type=resize&amp;processParameter_quality=85&amp;processParameter_width=160&amp;source_type=url&amp;source_ownerId=uHoiisEUIfT5kLr0iuriAatR1wf2&amp;source_name=logo&amp;source_url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fchatpay-cd120.appspot.com%2Fo%2Fprivate%252Fcheckout%252FqL8SCo5KiWT0UM45g5fa%252FeqWrNb7Y.png%3Falt%3Dmedia%26token%3Dfc5cf2ce-4090-426b-a0f8-d084dbb8a655"/>
+</header>
+<section class="checkout-card" id="checkoutCard">
+<div id="checkoutStep">
+<div class="product-summary">
+<img alt="Curso Peelings e Cosmecêuticos" class="product-image" src="https://pay.hub.la/app/api/bff-asset-cache?processParameter_outputType=webp&amp;processParameter_type=resize&amp;processParameter_quality=85&amp;processParameter_width=140&amp;source_type=url&amp;source_ownerId=uHoiisEUIfT5kLr0iuriAatR1wf2&amp;source_name=productImage&amp;source_url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fchatpay-cd120.appspot.com%2Fo%2Fprivate%252FqL8SCo5KiWT0UM45g5fa%252F7MuVKqBZ.png%3Falt%3Dmedia%26token%3Df47e2233-e361-4c5f-861d-fca4fe2a4810"/>
+<div class="product-copy">
+<h1>SKN Science Academy | Peelings e Cosmecêuticos</h1>
+<p class="old-price">De: R$ 7.200,00</p>
+<p class="current-price">Por: <strong>R$ 870,00</strong></p>
+</div>
+<button aria-label="Detalhes do produto" class="details-button" type="button">Detalhes <span>⌄</span></button>
+</div>
+<button class="coupon-button" disabled="" type="button">Adicionar cupom <span>＋</span></button>
+<form id="checkoutForm" novalidate="">
+<fieldset>
+<legend>Informações pessoais</legend>
+<div class="input-stack">
+<label class="sr-only" for="email">E-mail</label>
+<input autocomplete="email" id="email" name="email" placeholder="Email" required="" type="email"/>
+<label class="sr-only" for="phone">Telefone</label>
+<div class="phone-wrap">
+<span aria-hidden="true" class="flag">🇧🇷</span>
+<input autocomplete="tel" id="phone" inputmode="numeric" maxlength="16" name="phone" placeholder="Telefone" required="" type="tel"/>
+</div>
+<label class="sr-only" for="name">Nome completo</label>
+<input autocomplete="name" id="name" maxlength="100" name="name" placeholder="Nome completo" required="" type="text"/>
+</div>
+</fieldset>
+<fieldset>
+<legend>Plano de assinatura</legend>
+<div aria-label="Plano anual" class="select-like">
+<span>Anual</span><span>⌄</span>
+</div>
+</fieldset>
+<fieldset>
+<legend>Método de pagamento</legend>
+<div aria-label="Pix selecionado" class="payment-method active">
+<div aria-hidden="true" class="pix-symbol"><svg fill="none" height="20" viewbox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M5.59935 5.63592C5.50809 5.63592 5.46239 5.52558 5.52692 5.46105L8.27602 2.71191C9.22885 1.7627 10.7708 1.7627 11.7237 2.71191L14.4728 5.46105C14.5373 5.52558 14.4916 5.63592 14.4004 5.63592C13.8185 5.63592 13.2693 5.8614 12.8584 6.276L10.3853 8.73813C10.1708 8.9527 9.82892 8.9527 9.61435 8.73813L7.14134 6.276C6.73039 5.8614 6.18124 5.63592 5.59935 5.63592Z" fill="currentColor"></path><path d="M14.4004 14.3652C14.4916 14.3652 14.5373 14.4755 14.4728 14.5401L11.7237 17.2892C10.7708 18.2384 9.22885 18.2384 8.27602 17.2892L5.52692 14.5401C5.46239 14.4755 5.50809 14.3652 5.59935 14.3652C6.18124 14.3652 6.73039 14.1397 7.14134 13.7251L9.61435 11.263C9.82892 11.0484 10.1708 11.0484 10.3853 11.263L12.8584 13.7251C13.2693 14.1397 13.8185 14.3652 14.4004 14.3652Z" fill="currentColor"></path><path d="M17.2881 11.724L16.0643 12.9477C15.6231 13.389 15.0246 13.6369 14.4005 13.6369C14.0114 13.6369 13.6477 13.4842 13.3713 13.2114L10.8983 10.7457C10.4037 10.251 9.59632 10.251 9.10172 10.7457L6.62871 13.2114C6.35231 13.4842 5.98864 13.6369 5.5995 13.6369C4.97544 13.6369 4.37694 13.389 3.93566 12.9477L2.7119 11.724C1.7627 10.7711 1.7627 9.2291 2.7119 8.27625L3.93566 7.05247C4.37694 6.61119 4.97544 6.36328 5.5995 6.36328C5.98864 6.36328 6.35231 6.51603 6.62871 6.78879L9.10172 9.25456C9.34902 9.50186 9.67633 9.62551 10 9.62551C10.3237 9.62551 10.651 9.50186 10.8983 9.25456L13.3713 6.78879C13.6477 6.51603 14.0114 6.36328 14.4005 6.36328C15.0246 6.36328 15.6231 6.61119 16.0643 7.05247L17.2881 8.27625C18.2373 9.2291 18.2373 10.7711 17.2881 11.724Z" fill="currentColor"></path></svg></div>
+<div>
+<strong>Pix</strong>
+<small>Pagamento à vista</small>
+</div>
+<span class="selected-check">✓</span>
+</div>
+</fieldset>
+<fieldset>
+<legend>Documento</legend>
+<label class="sr-only" for="document">CPF ou CNPJ</label>
+<input autocomplete="off" class="single-input" id="document" inputmode="numeric" maxlength="18" name="document" placeholder="CPF/CNPJ" required="" type="text"/>
+</fieldset>
+<p aria-live="polite" class="form-error" id="formError" role="alert"></p>
+<button class="submit-button" id="submitButton" type="submit">
+<span class="button-label">Gerar Pix</span>
+<span aria-hidden="true" class="spinner"></span>
+</button>
+<div class="secure-note">
+<span aria-hidden="true" class="lock-icon"><svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="16" r="1"></circle><rect height="12" rx="2" width="18" x="3" y="10"></rect><path d="M7 10V7a5 5 0 0 1 10 0v3"></path></svg></span>
             Transação Segura e Criptografada
           </div>
-        </form>
-      </div>
-
-      <div class="pix-step" id="pixStep" hidden>
-        <div class="success-icon" aria-hidden="true">✓</div>
-        <h2>Seu Pix foi gerado</h2>
-        <p class="pix-subtitle">Escaneie o QR Code ou copie o código abaixo para realizar o pagamento.</p>
-
-        <div class="qr-card">
-          <img id="qrCodeImage" alt="QR Code Pix">
-        </div>
-
-        <div class="amount-box">
-          <span>Valor do pagamento</span>
-          <strong>R$ 4.200,00</strong>
-        </div>
-
-        <label class="pix-code-label" for="pixCode">Pix Copia e Cola</label>
-        <div class="pix-code-wrap">
-          <textarea id="pixCode" readonly></textarea>
-          <button id="copyPixButton" type="button">Copiar código</button>
-        </div>
-        <p class="copy-feedback" id="copyFeedback" aria-live="polite"></p>
-
-        <div class="pending-status">
-          <span class="pulse-dot"></span>
-          <div>
-            <strong>Aguardando pagamento</strong>
-            <small id="expirationText">O código Pix expira em até 1 dia.</small>
-          </div>
-        </div>
-
-        <button class="manual-release-button" id="manualReleaseButton" type="button" hidden>Já paguei — solicitar liberação</button>
-        <button class="back-button" id="backButton" type="button">Voltar ao formulário</button>
-
-        <p class="transaction-ref" id="transactionRef"></p>
-      </div>
-    </section>
-
-    <section class="legal-text">
-      <p>Ao confirmar sua assinatura, você concorda com os Termos de Uso e autoriza a cobrança referente ao acesso anual. O cancelamento de futuras renovações poderá ser solicitado conforme as regras do produto.</p>
-      <p class="powered">Pagamento processado em ambiente seguro</p>
-      <nav><span>2026</span><a href="#">Termos</a><a href="#">Privacidade</a></nav>
-    </section>
-  </main>
-
-  <script src="/app.js" defer></script>
+</form>
+</div>
+<div class="pix-step" hidden="" id="pixStep">
+<div aria-hidden="true" class="success-icon">✓</div>
+<h2>Seu Pix foi gerado</h2>
+<p class="pix-subtitle">Escaneie o QR Code ou copie o código abaixo para realizar o pagamento.</p>
+<div class="qr-card">
+<img alt="QR Code Pix" id="qrCodeImage"/>
+</div>
+<div class="amount-box">
+<span>Valor do pagamento</span>
+<strong>R$ 870,00</strong>
+</div>
+<label class="pix-code-label" for="pixCode">Pix Copia e Cola</label>
+<div class="pix-code-wrap">
+<textarea id="pixCode" readonly=""></textarea>
+<button id="copyPixButton" type="button">Copiar código</button>
+</div>
+<p aria-live="polite" class="copy-feedback" id="copyFeedback"></p>
+<div class="pending-status">
+<span class="pulse-dot"></span>
+<div>
+<strong>Aguardando pagamento</strong>
+<small id="expirationText">O código Pix expira em até 1 dia.</small>
+</div>
+</div>
+<button class="manual-release-button" hidden="" id="manualReleaseButton" type="button">Já paguei — solicitar liberação</button>
+<button class="back-button" id="backButton" type="button">Voltar ao formulário</button>
+<p class="transaction-ref" id="transactionRef"></p>
+</div>
+</section>
+<section class="legal-text">
+<p>Ao confirmar sua assinatura, você concorda com os Termos de Uso e autoriza a cobrança referente ao acesso anual. O cancelamento de futuras renovações poderá ser solicitado conforme as regras do produto.</p>
+<p class="powered">Pagamento processado em ambiente seguro</p>
+<nav><span>2026</span><a href="#">Termos</a><a href="#">Privacidade</a></nav>
+</section>
+</main>
+<script defer="" src="/app.js"></script>
 </body>
 </html>
