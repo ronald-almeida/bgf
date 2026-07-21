@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#3d0045">
+  <meta name="description" content="Checkout SKN Science Academy">
+  <title>SKN Science Academy | Peelings e Cosmecêuticos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="page-shell">
+    <header class="brand-header" aria-label="SKN Science Academy">
+      <img class="brand-logo" src="https://pay.hub.la/app/api/bff-asset-cache?processParameter_outputType=webp&processParameter_type=resize&processParameter_quality=85&processParameter_width=160&source_type=url&source_ownerId=uHoiisEUIfT5kLr0iuriAatR1wf2&source_name=logo&source_url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fchatpay-cd120.appspot.com%2Fo%2Fprivate%252Fcheckout%252FqL8SCo5KiWT0UM45g5fa%252FeqWrNb7Y.png%3Falt%3Dmedia%26token%3Dfc5cf2ce-4090-426b-a0f8-d084dbb8a655" alt="SKN Science Academy">
+    </header>
+
+    <section class="checkout-card" id="checkoutCard">
+      <div id="checkoutStep">
+        <div class="product-summary">
+          <img class="product-image" src="https://pay.hub.la/app/api/bff-asset-cache?processParameter_outputType=webp&processParameter_type=resize&processParameter_quality=85&processParameter_width=140&source_type=url&source_ownerId=uHoiisEUIfT5kLr0iuriAatR1wf2&source_name=productImage&source_url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fchatpay-cd120.appspot.com%2Fo%2Fprivate%252FqL8SCo5KiWT0UM45g5fa%252F7MuVKqBZ.png%3Falt%3Dmedia%26token%3Df47e2233-e361-4c5f-861d-fca4fe2a4810" alt="Curso Peelings e Cosmecêuticos">
+          <div class="product-copy">
+            <h1>SKN Science Academy | Peelings e Cosmecêuticos</h1>
+            <p class="old-price">De: R$ 7.200,00</p>
+            <p class="current-price">Por: <strong>R$ 4.200,00</strong></p>
+          </div>
+          <button class="details-button" type="button" aria-label="Detalhes do produto">Detalhes <span>⌄</span></button>
+        </div>
+
+        <button class="coupon-button" type="button" disabled>Adicionar cupom <span>＋</span></button>
+
+        <form id="checkoutForm" novalidate>
+          <fieldset>
+            <legend>Informações pessoais</legend>
+            <div class="input-stack">
+              <label class="sr-only" for="email">E-mail</label>
+              <input id="email" name="email" type="email" autocomplete="email" placeholder="Email" required>
+
+              <label class="sr-only" for="phone">Telefone</label>
+              <div class="phone-wrap">
+                <span class="flag" aria-hidden="true">🇧🇷</span>
+                <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="Telefone" maxlength="16" required>
+              </div>
+
+              <label class="sr-only" for="name">Nome completo</label>
+              <input id="name" name="name" type="text" autocomplete="name" placeholder="Nome completo" maxlength="100" required>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Plano de assinatura</legend>
+            <div class="select-like" aria-label="Plano anual">
+              <span>Anual</span><span>⌄</span>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Método de pagamento</legend>
+            <div class="payment-method active" aria-label="Pix selecionado">
+              <div class="pix-symbol" aria-hidden="true">
+                <span></span><span></span><span></span><span></span>
+              </div>
+              <div>
+                <strong>Pix</strong>
+                <small>Pagamento à vista</small>
+              </div>
+              <span class="selected-check">✓</span>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Documento</legend>
+            <label class="sr-only" for="document">CPF ou CNPJ</label>
+            <input class="single-input" id="document" name="document" type="text" inputmode="numeric" autocomplete="off" placeholder="CPF/CNPJ" maxlength="18" required>
+          </fieldset>
+
+          <p class="form-error" id="formError" role="alert" aria-live="polite"></p>
+
+          <button class="submit-button" id="submitButton" type="submit">
+            <span class="button-label">Gerar Pix</span>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+
+          <div class="secure-note">
+            <span class="lock-icon" aria-hidden="true">▣</span>
+            Transação Segura e Criptografada
+          </div>
+        </form>
+      </div>
+
+      <div class="pix-step" id="pixStep" hidden>
+        <div class="success-icon" aria-hidden="true">✓</div>
+        <h2>Seu Pix foi gerado</h2>
+        <p class="pix-subtitle">Escaneie o QR Code ou copie o código abaixo para realizar o pagamento.</p>
+
+        <div class="qr-card">
+          <img id="qrCodeImage" alt="QR Code Pix">
+        </div>
+
+        <div class="amount-box">
+          <span>Valor do pagamento</span>
+          <strong>R$ 4.200,00</strong>
+        </div>
+
+        <label class="pix-code-label" for="pixCode">Pix Copia e Cola</label>
+        <div class="pix-code-wrap">
+          <textarea id="pixCode" readonly></textarea>
+          <button id="copyPixButton" type="button">Copiar código</button>
+        </div>
+        <p class="copy-feedback" id="copyFeedback" aria-live="polite"></p>
+
+        <div class="pending-status">
+          <span class="pulse-dot"></span>
+          <div>
+            <strong>Aguardando pagamento</strong>
+            <small id="expirationText">O código Pix expira em até 1 dia.</small>
+          </div>
+        </div>
+
+        <button class="manual-release-button" id="manualReleaseButton" type="button" hidden>Já paguei — solicitar liberação</button>
+        <button class="back-button" id="backButton" type="button">Voltar ao formulário</button>
+
+        <p class="transaction-ref" id="transactionRef"></p>
+      </div>
+    </section>
+
+    <section class="legal-text">
+      <p>Ao confirmar sua assinatura, você concorda com os Termos de Uso e autoriza a cobrança referente ao acesso anual. O cancelamento de futuras renovações poderá ser solicitado conforme as regras do produto.</p>
+      <p class="powered">Pagamento processado em ambiente seguro</p>
+      <nav><span>2026</span><a href="#">Termos</a><a href="#">Privacidade</a></nav>
+    </section>
+  </main>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>

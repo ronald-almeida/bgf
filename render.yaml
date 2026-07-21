@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: skn-checkout-pix
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: PAYSHARK_API_URL
+        value: https://api.paysharkgateway.com.br/v1/transactions
+      - key: AUTH_HEADER_NAME
+        sync: false
+      - key: AUTH_HEADER_VALUE
+        sync: false
+      - key: WHATSAPP_NUMBER
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
