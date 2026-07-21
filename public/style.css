@@ -112,25 +112,31 @@ input:focus, textarea:focus { box-shadow: inset 0 0 0 1px #71747e; }
 .select-like { height: 37px; padding: 0 12px; display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
 
 .payment-method {
-  min-height: 74px;
+  width: 155px;
+  min-height: 80px;
   border: 1px solid var(--border-strong);
   background: #1d1e22;
   border-radius: 7px;
   display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 15px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
   position: relative;
 }
-.payment-method strong { display: block; font-size: 13px; margin-bottom: 3px; }
-.payment-method small { color: var(--muted); font-size: 11px; }
-.selected-check { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); width: 21px; height: 21px; border-radius: 50%; display: grid; place-items: center; background: var(--green); color: #08140e; font-weight: 800; font-size: 13px; }
-.pix-symbol { width: 24px; height: 24px; position: relative; transform: rotate(45deg); }
-.pix-symbol span { position: absolute; width: 9px; height: 9px; border: 2px solid #fff; border-radius: 3px; }
-.pix-symbol span:nth-child(1) { top: 0; left: 0; }
-.pix-symbol span:nth-child(2) { top: 0; right: 0; }
-.pix-symbol span:nth-child(3) { bottom: 0; left: 0; }
-.pix-symbol span:nth-child(4) { bottom: 0; right: 0; }
+.payment-method strong { display: block; font-size: 12px; line-height: 1; margin: 0; }
+.payment-method small,
+.selected-check { display: none; }
+.pix-symbol {
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  flex: 0 0 16px;
+}
+.pix-symbol svg { width: 16px; height: 16px; display: block; }
 
 .single-input { height: 36px; }
 .form-error { min-height: 18px; color: var(--danger); font-size: 12px; margin: -8px 0 8px; }
@@ -154,8 +160,9 @@ input:focus, textarea:focus { box-shadow: inset 0 0 0 1px #71747e; }
 .submit-button.loading .spinner { display: inline-block; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.secure-note { display: flex; justify-content: center; align-items: center; gap: 8px; color: #c6c7cd; font-size: 11px; margin-top: 17px; }
-.lock-icon { color: var(--green); font-size: 14px; }
+.secure-note { display: flex; justify-content: center; align-items: center; gap: 6px; color: #c6c7cd; font-size: 12px; line-height: 1; margin-top: 14px; }
+.lock-icon { width: 14px; height: 14px; display: grid; place-items: center; color: var(--green); flex: 0 0 14px; }
+.lock-icon svg { width: 14px; height: 14px; display: block; stroke-width: 2; }
 
 .legal-text { color: #b6a9bd; text-align: center; font-size: 11px; line-height: 1.55; padding: 66px 28px 0; }
 .legal-text p { margin: 0 auto 26px; max-width: 500px; }
