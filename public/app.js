@@ -16,7 +16,6 @@ const transactionRef = document.getElementById('transactionRef');
 
 let lastTransaction = null;
 let whatsappEnabled = false;
-let statusPollingId = null;
 
 const fields = {
   name: document.getElementById('name'),
@@ -78,45 +77,6 @@ function showError(message) {
   formError.textContent = message || '';
 }
 
-function stopStatusPolling() {
-  if (statusPollingId) {
-    clearInterval(statusPollingId);
-    statusPollingId = null;
-  }
-}
-
-function startStatusPolling(transactionId) {
-  stopStatusPolling();
-  if (!transactionId) return;
-
-  const check = async () => {
-    try {
-      const response = await fetch(`/api/check-status?id=${encodeURIComponent(transactionId)}`, {
-        cache: 'no-store'
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || !data.ok) return;
-
-      const status = String(data.transaction?.status || '').toLowerCase();
-      if (status === 'paid') {
-        stopStatusPolling();
-        const statusTitle = document.querySelector('.pending-status strong');
-        const statusDetail = document.querySelector('.pending-status small');
-        if (statusTitle) statusTitle.textContent = 'Pagamento confirmado';
-        if (statusDetail) statusDetail.textContent = 'Seu pagamento Pix foi identificado com sucesso.';
-        manualReleaseButton.hidden = true;
-      } else if (status === 'refused' || status === 'refunded') {
-        stopStatusPolling();
-      }
-    } catch {
-      // Mantém o polling; falhas temporárias não devem interromper a tela do Pix.
-    }
-  };
-
-  check();
-  statusPollingId = setInterval(check, 5000);
-}
-
 function displayPix(data) {
   lastTransaction = data.transaction;
   qrCodeImage.src = data.pix.qrCodeDataUrl;
@@ -133,7 +93,6 @@ function displayPix(data) {
   }
 
   manualReleaseButton.hidden = !whatsappEnabled;
-  startStatusPolling(data.transaction.id);
   checkoutStep.hidden = true;
   pixStep.hidden = false;
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -206,7 +165,6 @@ manualReleaseButton.addEventListener('click', async () => {
 });
 
 backButton.addEventListener('click', () => {
-  stopStatusPolling();
   pixStep.hidden = true;
   checkoutStep.hidden = false;
   lastTransaction = null;
@@ -215,4 +173,3 @@ backButton.addEventListener('click', () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
-window.addEventListener('beforeunload', stopStatusPolling);
