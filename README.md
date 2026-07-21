@@ -1,81 +1,40 @@
-# Checkout Pix — SKN Science Academy
+# Checkout Pix — SKN Science Academy + UmbrellaPag
 
-Projeto Node.js + Express preparado para hospedagem no Render. O checkout mantém a identidade visual do modelo enviado e deixa apenas Pix ativo.
+Projeto Node.js + Express para GitHub e Render, com checkout Pix e liberação manual.
 
-## Estrutura
-
-- `server.js`: backend e integração com a PayShark.
-- `public/index.html`: checkout.
-- `public/style.css`: layout responsivo.
-- `public/app.js`: validação, geração, cópia do Pix e liberação manual.
-- `render.yaml`: configuração opcional de Blueprint no Render.
-
-## Configuração local
-
-```bash
-npm install
-cp .env.example .env
-npm start
-```
-
-Acesse `http://localhost:3000`.
-
-## Variáveis obrigatórias no Render
-
-Configure em **Environment**:
+## Variáveis no Render
 
 ```env
-PAYSHARK_API_URL=https://api.paysharkgateway.com.br/v1/transactions
-AUTH_HEADER_NAME=Authorization
-AUTH_HEADER_VALUE=Bearer SEU_TOKEN
-WHATSAPP_NUMBER=5575999999999
+UMBRELLA_API_URL=https://api-gateway.umbrellapag.com/api/user/transactions
+UMBRELLA_API_KEY=SUA_X_API_KEY
 PUBLIC_BASE_URL=https://seu-servico.onrender.com
+WHATSAPP_NUMBER=5575999999999
 ```
 
-A autenticação acima é apenas um exemplo. Como a documentação enviada ainda não informa o cabeçalho exato, `AUTH_HEADER_NAME` e `AUTH_HEADER_VALUE` foram deixados configuráveis.
+Remova as variáveis antigas da PayShark (`PAYSHARK_API_URL`, `PAYSHARK_SECRET_KEY`, `AUTH_HEADER_NAME`, `AUTH_HEADER_VALUE`).
 
-Exemplos:
+## GitHub + Render
 
-```env
-AUTH_HEADER_NAME=x-api-key
-AUTH_HEADER_VALUE=SUA_CHAVE
+1. Envie todos os arquivos para o repositório GitHub.
+2. No Render, conecte o repositório como Web Service.
+3. Build Command: `npm install`
+4. Start Command: `npm start`
+5. Cadastre as variáveis acima.
+6. Execute `Clear build cache & deploy`.
+
+## Valor cobrado
+
+O valor real enviado ao gateway fica no `server.js`:
+
+```js
+amount: 87000
 ```
 
-ou:
+A API trabalha em centavos. Exemplo: R$ 870,00 = `87000`.
 
-```env
-AUTH_HEADER_NAME=Authorization
-AUTH_HEADER_VALUE=Basic SEU_TOKEN
-```
+## Fluxo
 
-## Publicação manual no Render
-
-1. Envie os arquivos para um repositório GitHub.
-2. No Render, crie um **Web Service**.
-3. Selecione o repositório.
-4. Build Command: `npm install`
-5. Start Command: `npm start`
-6. Adicione as variáveis de ambiente.
-7. Publique.
-
-## Blueprint
-
-Também é possível usar o arquivo `render.yaml` com a opção **New Blueprint Instance**.
-
-## Segurança
-
-- O valor é fixado no backend em `87000` centavos, impedindo alteração pelo navegador.
-- A credencial da PayShark fica somente no ambiente do Render.
-- O frontend não recebe o token da API.
-- A primeira versão não confirma pagamento automaticamente; a liberação é manual.
-
-## Observação sobre a API
-
-O código espera que a PayShark retorne o Pix em um destes campos:
-
-- `pix.qrcode`
-- `pix.qrCode`
-- `pix.copyPaste`
-- `pix.emv`
-
-O primeiro formato é o indicado na documentação enviada. Caso a resposta real tenha outro nome, ajuste a função `extractPixCode` em `server.js`.
+- O navegador envia somente nome, e-mail, telefone e CPF/CNPJ.
+- O backend fixa o preço e cria a transação na UmbrellaPag.
+- O QR Code e o Pix copia e cola são mostrados no checkout.
+- A liberação do acesso é manual.

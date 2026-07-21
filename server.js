@@ -11,11 +11,12 @@ const QRCode = require('qrcode');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
-const PAYSHARK_API_URL = process.env.PAYSHARK_API_URL || 'https://api.paysharkgateway.com.br/v1/transactions';
+const UMBRELLA_API_URL = process.env.UMBRELLA_API_URL || 'https://api-gateway.umbrellapag.com/api/user/transactions';
+
 const PRODUCT = Object.freeze({
   title: 'SKN Science Academy | Peelings e Cosmecêuticos',
   externalRef: 'skn-science-academy-peelings-cosmeceuticos',
-  amount: 57000,
+  amount: 87000,
   currency: 'BRL'
 });
 
@@ -70,38 +71,69 @@ function validateCustomer(body) {
   const email = String(body.email || '').trim().toLowerCase();
   const phone = onlyDigits(body.phone);
   const documentNumber = onlyDigits(body.document);
-  const documentType = documentNumber.length === 14 ? 'cnpj' : 'cpf';
+  const documentType = documentNumber.length === 14 ? 'CNPJ' : 'CPF';
 
   if (name.length < 3 || !name.includes(' ')) throw new Error('Informe o nome completo.');
   if (!isValidEmail(email)) throw new Error('Informe um e-mail válido.');
   if (phone.length < 10 || phone.length > 13) throw new Error('Informe um telefone válido com DDD.');
-  if (documentType === 'cpf' && !isValidCPF(documentNumber)) throw new Error('Informe um CPF válido.');
-  if (documentType === 'cnpj' && !isValidCNPJ(documentNumber)) throw new Error('Informe um CNPJ válido.');
+  if (documentType === 'CPF' && !isValidCPF(documentNumber)) throw new Error('Informe um CPF válido.');
+  if (documentType === 'CNPJ' && !isValidCNPJ(documentNumber)) throw new Error('Informe um CNPJ válido.');
 
   return { name, email, phone, documentNumber, documentType };
 }
 
-function buildHeaders() {
-  const secretKey = String(process.env.PAYSHARK_SECRET_KEY || '').trim();
-  if (!secretKey) {
-    throw new Error('A chave secreta da PayShark não foi configurada no Render.');
-  }
+function getClientIp(req) {
+  const forwarded = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+  return forwarded || req.socket.remoteAddress || '127.0.0.1';
+}
 
-  // PayShark: Basic base64(SECRET_KEY:)
-  const basicToken = Buffer.from(`${secretKey}:`, 'utf8').toString('base64');
+function buildHeaders() {
+  const apiKey = String(process.env.UMBRELLA_API_KEY || '').trim();
+  if (!apiKey) throw new Error('A chave da UmbrellaPag não foi configurada no Render.');
+
   return {
-    Authorization: `Basic ${basicToken}`,
+    'x-api-key': apiKey,
+    'User-Agent': 'UMBRELLAB2B/1.0',
     'Content-Type': 'application/json',
     Accept: 'application/json'
   };
 }
 
-function extractPixCode(apiResponse) {
-  return apiResponse?.pix?.qrcode || apiResponse?.pix?.qrCode || apiResponse?.pix?.copyPaste || apiResponse?.pix?.emv || null;
+function normalizeGatewayResponse(responseBody) {
+  return responseBody?.data && typeof responseBody.data === 'object'
+    ? responseBody.data
+    : responseBody;
+}
+
+function extractPixData(responseBody) {
+  const transaction = normalizeGatewayResponse(responseBody) || {};
+  const pix = transaction.pix && typeof transaction.pix === 'object' ? transaction.pix : {};
+
+  const candidates = [
+    transaction.qrCode,
+    transaction.qrcode,
+    pix.qrCode,
+    pix.qrcode,
+    pix.code,
+    pix.copyPaste,
+    pix.copyAndPaste,
+    pix.emv,
+    pix.payload
+  ];
+
+  const pixCode = candidates.find((value) => typeof value === 'string' && value.trim() && !value.startsWith('data:image'))?.trim() || null;
+  const qrCodeImage = candidates.find((value) => typeof value === 'string' && value.startsWith('data:image')) || null;
+
+  return {
+    transaction,
+    pixCode,
+    qrCodeImage,
+    expirationDate: pix.expirationDate || transaction.expirationDate || null
+  };
 }
 
 app.get('/health', (_req, res) => {
-  res.status(200).json({ ok: true });
+  res.status(200).json({ ok: true, gateway: 'UmbrellaPag' });
 });
 
 app.get('/api/config', (_req, res) => {
@@ -116,35 +148,40 @@ app.post('/api/create-pix', async (req, res) => {
   try {
     const customer = validateCustomer(req.body || {});
     const externalRef = `SKN-${Date.now()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+    const publicBaseUrl = String(process.env.PUBLIC_BASE_URL || '').replace(/\/$/, '');
 
     const payload = {
       amount: PRODUCT.amount,
       currency: PRODUCT.currency,
-      paymentMethod: 'pix',
-      pix: { expiresInDays: 1 },
+      paymentMethod: 'PIX',
+      installments: 1,
+      customer: {
+        name: customer.name,
+        email: customer.email,
+        document: {
+          number: customer.documentNumber,
+          type: customer.documentType
+        },
+        phone: customer.phone,
+        externalRef: `customer-${customer.documentNumber}`
+      },
       items: [{
         title: PRODUCT.title,
         unitPrice: PRODUCT.amount,
         quantity: 1,
-        tangible: false
+        tangible: false,
+        externalRef: PRODUCT.externalRef
       }],
-      customer: {
-        name: customer.name,
-        email: customer.email,
-        phone: customer.phone,
-        document: {
-          number: customer.documentNumber,
-          type: customer.documentType
-        }
-      },
-      externalRef
+      pix: { expiresInDays: 1 },
+      postbackUrl: publicBaseUrl ? `${publicBaseUrl}/api/postback` : '',
+      metadata: JSON.stringify({ product: PRODUCT.externalRef, checkoutRef: externalRef }),
+      traceable: true,
+      ip: getClientIp(req)
     };
 
-    const headers = buildHeaders();
-
-    const response = await fetch(PAYSHARK_API_URL, {
+    const response = await fetch(UMBRELLA_API_URL, {
       method: 'POST',
-      headers,
+      headers: buildHeaders(),
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(20000)
     });
@@ -158,24 +195,24 @@ app.post('/api/create-pix', async (req, res) => {
     }
 
     if (!response.ok) {
-      console.error('PayShark error:', response.status, data);
+      console.error('UmbrellaPag error:', response.status, data);
       return res.status(response.status >= 400 && response.status < 500 ? 400 : 502).json({
         ok: false,
-        message: data?.message || 'Não foi possível gerar o Pix.',
-        gatewayCode: data?.code || response.status
+        message: data?.message || data?.error?.message || 'Não foi possível gerar o Pix.',
+        gatewayCode: data?.status || response.status
       });
     }
 
-    const pixCode = extractPixCode(data);
-    if (!pixCode) {
-      console.error('Resposta sem código Pix:', data);
+    const extracted = extractPixData(data);
+    if (!extracted.pixCode && !extracted.qrCodeImage) {
+      console.error('Resposta UmbrellaPag sem código Pix reconhecido:', data);
       return res.status(502).json({
         ok: false,
-        message: 'A cobrança foi criada, mas a API não retornou o código Pix esperado.'
+        message: 'A transação foi criada, mas o gateway não retornou o código Pix em um campo reconhecido. Consulte os logs do Render.'
       });
     }
 
-    const qrCodeDataUrl = await QRCode.toDataURL(pixCode, {
+    const qrCodeDataUrl = extracted.qrCodeImage || await QRCode.toDataURL(extracted.pixCode, {
       width: 420,
       margin: 1,
       errorCorrectionLevel: 'M'
@@ -184,14 +221,14 @@ app.post('/api/create-pix', async (req, res) => {
     return res.status(200).json({
       ok: true,
       transaction: {
-        id: data.id,
-        externalRef: data.externalRef || externalRef,
-        status: data.status || 'pending',
-        amount: data.amount || PRODUCT.amount,
-        expirationDate: data?.pix?.expirationDate || null
+        id: extracted.transaction.id || null,
+        externalRef: extracted.transaction.externalRef || externalRef,
+        status: extracted.transaction.status || 'WAITING_PAYMENT',
+        amount: extracted.transaction.amount || PRODUCT.amount,
+        expirationDate: extracted.expirationDate
       },
       pix: {
-        code: pixCode,
+        code: extracted.pixCode || '',
         qrCodeDataUrl
       }
     });
@@ -205,51 +242,10 @@ app.post('/api/create-pix', async (req, res) => {
   }
 });
 
-app.get('/api/check-status', async (req, res) => {
-  try {
-    const transactionId = String(req.query.id || '').trim();
-    if (!/^\d+$/.test(transactionId)) {
-      return res.status(400).json({ ok: false, message: 'ID da transação inválido.' });
-    }
-
-    const response = await fetch(`${PAYSHARK_API_URL}/${encodeURIComponent(transactionId)}`, {
-      method: 'GET',
-      headers: buildHeaders(),
-      signal: AbortSignal.timeout(15000)
-    });
-
-    const rawText = await response.text();
-    let data;
-    try { data = rawText ? JSON.parse(rawText) : {}; }
-    catch { data = { message: rawText || 'Resposta inválida do gateway.' }; }
-
-    if (!response.ok) {
-      console.error('PayShark status error:', response.status, data);
-      return res.status(response.status >= 400 && response.status < 500 ? 400 : 502).json({
-        ok: false,
-        message: data?.message || 'Não foi possível consultar o pagamento.',
-        gatewayCode: data?.code || response.status
-      });
-    }
-
-    return res.json({
-      ok: true,
-      transaction: {
-        id: data.id,
-        status: data.status || 'pending',
-        amount: data.amount,
-        externalRef: data.externalRef || null,
-        expirationDate: data?.pix?.expirationDate || null
-      }
-    });
-  } catch (error) {
-    const isTimeout = error?.name === 'TimeoutError' || error?.name === 'AbortError';
-    console.error('check-status error:', error);
-    return res.status(isTimeout ? 504 : 500).json({
-      ok: false,
-      message: isTimeout ? 'A consulta ao gateway demorou para responder.' : (error.message || 'Erro ao consultar pagamento.')
-    });
-  }
+// Recebe notificações do gateway, mas a liberação permanece manual.
+app.post('/api/postback', (req, res) => {
+  console.log('UmbrellaPag postback:', JSON.stringify(req.body || {}));
+  res.sendStatus(204);
 });
 
 app.post('/api/manual-release-link', (req, res) => {
@@ -260,14 +256,17 @@ app.post('/api/manual-release-link', (req, res) => {
   const message = [
     'Olá! Já realizei o pagamento via Pix e gostaria de solicitar a liberação manual.',
     '',
-    `Nome: ${String(name || '-').trim()}`,
-    `E-mail: ${String(email || '-').trim()}`,
-    `Telefone: ${onlyDigits(phone) || '-'}`,
-    `Transação: ${String(transactionId || '-').trim()}`,
-    `Referência: ${String(externalRef || '-').trim()}`
+    `Nome: ${String(name || '').trim()}`,
+    `E-mail: ${String(email || '').trim()}`,
+    `Telefone: ${String(phone || '').trim()}`,
+    `Transação: ${String(transactionId || '-')}`,
+    `Referência: ${String(externalRef || '-')}`
   ].join('\n');
 
-  res.json({ ok: true, url: `https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}` });
+  return res.json({
+    ok: true,
+    url: `https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}`
+  });
 });
 
 app.get('*', (_req, res) => {
@@ -275,5 +274,5 @@ app.get('*', (_req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Checkout iniciado na porta ${PORT}`);
+  console.log(`Servidor iniciado na porta ${PORT}. Gateway: UmbrellaPag.`);
 });

@@ -9,11 +9,9 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 20
-      - key: PAYSHARK_API_URL
-        value: https://api.paysharkgateway.com.br/v1/transactions
-      - key: AUTH_HEADER_NAME
-        sync: false
-      - key: AUTH_HEADER_VALUE
+      - key: UMBRELLA_API_URL
+        value: https://api-gateway.umbrellapag.com/api/user/transactions
+      - key: UMBRELLA_API_KEY
         sync: false
       - key: WHATSAPP_NUMBER
         sync: false
