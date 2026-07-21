@@ -16,7 +16,7 @@ const UMBRELLA_API_URL = process.env.UMBRELLA_API_URL || 'https://api-gateway.um
 const PRODUCT = Object.freeze({
   title: 'SKN Science Academy | Peelings e Cosmecêuticos',
   externalRef: 'skn-science-academy-peelings-cosmeceuticos',
-  amount: 87000,
+  amount: 77000,
   currency: 'BRL'
 });
 
