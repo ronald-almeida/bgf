@@ -15,7 +15,7 @@ const PAYSHARK_API_URL = process.env.PAYSHARK_API_URL || 'https://api.paysharkga
 const PRODUCT = Object.freeze({
   title: 'SKN Science Academy | Peelings e Cosmecêuticos',
   externalRef: 'skn-science-academy-peelings-cosmeceuticos',
-  amount: 69700,
+  amount: 29700,
   currency: 'BRL'
 });
 
