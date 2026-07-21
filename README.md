@@ -64,7 +64,7 @@ Também é possível usar o arquivo `render.yaml` com a opção **New Blueprint 
 
 ## Segurança
 
-- O valor é fixado no backend em `420000` centavos, impedindo alteração pelo navegador.
+- O valor é fixado no backend em `87000` centavos, impedindo alteração pelo navegador.
 - A credencial da PayShark fica somente no ambiente do Render.
 - O frontend não recebe o token da API.
 - A primeira versão não confirma pagamento automaticamente; a liberação é manual.

@@ -15,7 +15,7 @@ const PAYSHARK_API_URL = process.env.PAYSHARK_API_URL || 'https://api.paysharkga
 const PRODUCT = Object.freeze({
   title: 'SKN Science Academy | Peelings e Cosmecêuticos',
   externalRef: 'skn-science-academy-peelings-cosmeceuticos',
-  amount: 420000,
+  amount: 87000,
   currency: 'BRL'
 });
 
@@ -82,12 +82,18 @@ function validateCustomer(body) {
 }
 
 function buildHeaders() {
-  const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
-  const authHeaderName = String(process.env.AUTH_HEADER_NAME || '').trim();
-  const authHeaderValue = String(process.env.AUTH_HEADER_VALUE || '').trim();
+  const secretKey = String(process.env.PAYSHARK_SECRET_KEY || '').trim();
+  if (!secretKey) {
+    throw new Error('A chave secreta da PayShark não foi configurada no Render.');
+  }
 
-  if (authHeaderName && authHeaderValue) headers[authHeaderName] = authHeaderValue;
-  return headers;
+  // PayShark: Basic base64(SECRET_KEY:)
+  const basicToken = Buffer.from(`${secretKey}:`, 'utf8').toString('base64');
+  return {
+    Authorization: `Basic ${basicToken}`,
+    'Content-Type': 'application/json',
+    Accept: 'application/json'
+  };
 }
 
 function extractPixCode(apiResponse) {
@@ -110,7 +116,6 @@ app.post('/api/create-pix', async (req, res) => {
   try {
     const customer = validateCustomer(req.body || {});
     const externalRef = `SKN-${Date.now()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
-    const publicBaseUrl = String(process.env.PUBLIC_BASE_URL || '').replace(/\/$/, '');
 
     const payload = {
       amount: PRODUCT.amount,
@@ -119,10 +124,9 @@ app.post('/api/create-pix', async (req, res) => {
       pix: { expiresInDays: 1 },
       items: [{
         title: PRODUCT.title,
-        quantity: 1,
-        tangible: false,
         unitPrice: PRODUCT.amount,
-        externalRef: PRODUCT.externalRef
+        quantity: 1,
+        tangible: false
       }],
       customer: {
         name: customer.name,
@@ -133,23 +137,10 @@ app.post('/api/create-pix', async (req, res) => {
           type: customer.documentType
         }
       },
-      externalRef,
-      metadata: JSON.stringify({
-        product: PRODUCT.externalRef,
-        source: 'checkout-render',
-        manualRelease: true
-      })
+      externalRef
     };
 
-    if (publicBaseUrl) payload.returnUrl = publicBaseUrl;
-
     const headers = buildHeaders();
-    if (!process.env.AUTH_HEADER_NAME || !process.env.AUTH_HEADER_VALUE) {
-      return res.status(503).json({
-        ok: false,
-        message: 'A autenticação da PayShark ainda não foi configurada no Render.'
-      });
-    }
 
     const response = await fetch(PAYSHARK_API_URL, {
       method: 'POST',
@@ -210,6 +201,53 @@ app.post('/api/create-pix', async (req, res) => {
     return res.status(isTimeout ? 504 : 400).json({
       ok: false,
       message: isTimeout ? 'O gateway demorou para responder. Tente novamente.' : (error.message || 'Não foi possível gerar o Pix.')
+    });
+  }
+});
+
+app.get('/api/check-status', async (req, res) => {
+  try {
+    const transactionId = String(req.query.id || '').trim();
+    if (!/^\d+$/.test(transactionId)) {
+      return res.status(400).json({ ok: false, message: 'ID da transação inválido.' });
+    }
+
+    const response = await fetch(`${PAYSHARK_API_URL}/${encodeURIComponent(transactionId)}`, {
+      method: 'GET',
+      headers: buildHeaders(),
+      signal: AbortSignal.timeout(15000)
+    });
+
+    const rawText = await response.text();
+    let data;
+    try { data = rawText ? JSON.parse(rawText) : {}; }
+    catch { data = { message: rawText || 'Resposta inválida do gateway.' }; }
+
+    if (!response.ok) {
+      console.error('PayShark status error:', response.status, data);
+      return res.status(response.status >= 400 && response.status < 500 ? 400 : 502).json({
+        ok: false,
+        message: data?.message || 'Não foi possível consultar o pagamento.',
+        gatewayCode: data?.code || response.status
+      });
+    }
+
+    return res.json({
+      ok: true,
+      transaction: {
+        id: data.id,
+        status: data.status || 'pending',
+        amount: data.amount,
+        externalRef: data.externalRef || null,
+        expirationDate: data?.pix?.expirationDate || null
+      }
+    });
+  } catch (error) {
+    const isTimeout = error?.name === 'TimeoutError' || error?.name === 'AbortError';
+    console.error('check-status error:', error);
+    return res.status(isTimeout ? 504 : 500).json({
+      ok: false,
+      message: isTimeout ? 'A consulta ao gateway demorou para responder.' : (error.message || 'Erro ao consultar pagamento.')
     });
   }
 });
