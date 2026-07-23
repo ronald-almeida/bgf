@@ -1,19 +1,17 @@
 services:
   - type: web
-    name: skn-checkout-pix
+    name: espiritualflix-checkout-pix
     runtime: node
-    plan: free
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /health
+    autoDeploy: true
     envVars:
       - key: NODE_VERSION
         value: 20
       - key: UMBRELLA_API_URL
         value: https://api-gateway.umbrellapag.com/api/user/transactions
       - key: UMBRELLA_API_KEY
-        sync: false
-      - key: WHATSAPP_NUMBER
         sync: false
       - key: PUBLIC_BASE_URL
         sync: false
