@@ -1,23 +1,6 @@
-const form=document.getElementById('checkoutForm');
-const btn=document.getElementById('generateButton');
-const copy=document.getElementById('copyButton');
-const err=document.getElementById('formError');
-const qr=document.getElementById('qrImage');
-const placeholder=document.getElementById('qrPlaceholder');
-const code=document.getElementById('pixCode');
-const status=document.getElementById('pixStatus');
-const digits=v=>String(v||'').replace(/\D/g,'');
-const maskDoc=v=>{const d=digits(v).slice(0,14);return d.length<=11?d.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2'):d.replace(/(\d{2})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1/$2').replace(/(\d{4})(\d{1,2})$/,'$1-$2')};
-document.getElementById('document').addEventListener('input',e=>e.target.value=maskDoc(e.target.value));
-document.getElementById('phone').addEventListener('input',e=>{const d=digits(e.target.value).slice(0,11);e.target.value=d.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d{1,4})$/,'$1-$2')});
-form.addEventListener('submit',async e=>{
- e.preventDefault();err.textContent='';btn.disabled=true;btn.textContent='Gerando Pix...';
- try{
-  const payload={email:document.getElementById('email').value,emailConfirm:document.getElementById('emailConfirm').value,name:document.getElementById('name').value,document:document.getElementById('document').value,phone:document.getElementById('phone').value};
-  const r=await fetch('/api/create-pix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-  const data=await r.json().catch(()=>({}));
-  if(!r.ok||!data.ok) throw new Error(data.message||'Não foi possível gerar o Pix.');
-  qr.src=data.pix.qrCodeDataUrl;qr.hidden=false;placeholder.hidden=true;code.value=data.pix.code||'';code.hidden=!data.pix.code;copy.disabled=!data.pix.code;status.hidden=false;
- }catch(ex){err.textContent=ex.message||'Erro ao gerar Pix.'}finally{btn.disabled=false;btn.textContent='⌘  Gerar código QR'}
-});
-copy.addEventListener('click',async()=>{if(!code.value)return;try{await navigator.clipboard.writeText(code.value);copy.textContent='Código copiado!';setTimeout(()=>copy.textContent='Copiar código Pix',1800)}catch{code.hidden=false;code.select();document.execCommand('copy')}});
+const form=document.getElementById('checkoutForm');const btn=document.getElementById('generateButton');const copy=document.getElementById('copyButton');const msg=document.getElementById('formMessage');const ph=document.getElementById('qrPlaceholder');const qr=document.getElementById('qrCode');const pix=document.getElementById('pixCode');const digits=v=>String(v||'').replace(/\D/g,'');
+function cpfOk(c){c=digits(c);if(c.length!==11||/^(\d)\1+$/.test(c))return false;let s=0;for(let i=0;i<9;i++)s+=+c[i]*(10-i);let d=11-s%11;if(d>=10)d=0;if(d!==+c[9])return false;s=0;for(let i=0;i<10;i++)s+=+c[i]*(11-i);d=11-s%11;if(d>=10)d=0;return d===+c[10]}
+document.getElementById('document').addEventListener('input',e=>e.target.value=digits(e.target.value).slice(0,14));document.getElementById('phone').addEventListener('input',e=>e.target.value=digits(e.target.value).slice(0,11));
+const getPix=o=>o?.pixCode||o?.qrCode||o?.qrcode||o?.data?.pixCode||o?.data?.qrCode||o?.data?.qrcode||o?.data?.pix?.qrcode||o?.data?.pix?.qrCode||o?.data?.pix?.copyPaste||'';
+form.addEventListener('submit',async e=>{e.preventDefault();msg.textContent='';const email=document.getElementById('email').value.trim(),email2=document.getElementById('emailConfirm').value.trim(),name=document.getElementById('name').value.trim(),documentNumber=digits(document.getElementById('document').value),phone=digits(document.getElementById('phone').value);if(!email||!email2||!name||!documentNumber||!phone){msg.textContent='Preencha todos os campos.';return}if(email!==email2){msg.textContent='Os emails informados não são iguais.';return}if(documentNumber.length===11&&!cpfOk(documentNumber)){msg.textContent='Informe um CPF válido.';return}btn.disabled=true;btn.querySelector('span:last-child').textContent='Gerando Pix...';try{const r=await fetch('/api/create-pix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,phone,document:documentNumber})});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.message||'Não foi possível gerar o Pix.');const code=getPix(j);if(!code){console.error(j);throw new Error('A cobrança foi criada, mas o gateway não retornou o código Pix.')}pix.value=code;ph.hidden=true;qr.innerHTML='';new QRCode(qr,{text:code,width:150,height:150,correctLevel:QRCode.CorrectLevel.M});copy.disabled=false;msg.textContent='Pix gerado. Escaneie ou copie o código.'}catch(err){msg.textContent=err.message}finally{btn.disabled=false;btn.querySelector('span:last-child').textContent='Gerar código QR'}});
+copy.addEventListener('click',async()=>{if(!pix.value)return;try{await navigator.clipboard.writeText(pix.value);msg.textContent='Código Pix copiado.'}catch{pix.hidden=false;pix.select();document.execCommand('copy');pix.hidden=true;msg.textContent='Código Pix copiado.'}});
