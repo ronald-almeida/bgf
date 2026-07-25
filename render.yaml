@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: academia-bordado-checkout
+    name: refrigeracao-comercial-checkout
     runtime: node
     plan: free
     buildCommand: npm install
