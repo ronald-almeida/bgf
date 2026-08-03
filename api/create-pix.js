@@ -1,7 +1,7 @@
 
 const PRODUCT = Object.freeze({
   title: "Formação em Perícias Judiciais Elétricas",
-  amount: 400000,
+  amount: 49700,
   externalRef: "formacao-pericias-judiciais-eletricas"
 });
 
