@@ -1,6 +1,6 @@
 const PRODUCT = Object.freeze({
   title: "Combo Premium - Ouse Passar",
-  amount: 49700,
+  amount: 34700,
   externalRef: "combo-premium-ouse-passar"
 });
 
