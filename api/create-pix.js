@@ -1,8 +1,8 @@
 
 const PRODUCT = Object.freeze({
-  title: "Formação em Perícias Judiciais Elétricas",
-  amount: 49700,
-  externalRef: "formacao-pericias-judiciais-eletricas"
+  title: "Combo Premium - Ouse Passar",
+  amount: 34700,
+  externalRef: "combo-premium-ouse-passar"
 });
 
 const API_URL =
